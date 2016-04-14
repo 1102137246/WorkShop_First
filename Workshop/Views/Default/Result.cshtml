@@ -12,26 +12,49 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Result</title>
+    <script>
+        var Delete = function (orderId, item) {
+            $.ajax({
+                url: '/Default/Delete',
+                type: 'GET',
+                data: {
+                    OrderID: orderId
+                },
+                error: function (xhr) {
+                    alert('Ajax request 發生錯誤');
+                },
+                success: function (response) {
+                    $('#msg_user_name').html(response);
+                }
+            });
+            $(item).parent().parent().remove();
+        }
+    </script>
 </head>
 <body>
-    <div> 
-        <table class="table table-striped">
+    <div>
+        <h2 style="text-align:center;"><strong>查詢結果</strong></h2>
+        <table class="table-bordered" style="width:70%; font-size:12pt;" align="center">
             <tr class="info">
-                <td>訂單編號</td>
-                <td>客戶名稱</td>
-                <td>訂購日期</td>
-                <td>發貨日期</td>
+                <td style="background-color:#00994C; color:white; text-align:center;">訂單編號</td>
+                <td style="background-color:#00994C; color:white; text-align:center;">客戶名稱</td>
+                <td style="background-color:#00994C; color:white; text-align:center;">訂購日期</td>
+                <td style="background-color:#00994C; color:white; text-align:center;">發貨日期</td>
+                <td></td>
+                <td></td>
             </tr>
-        @foreach (var @item in (List<Workshop.Models.Order>)@ViewBag.result)
-        {
-            <tr>
-                <td>@item.OrderID</td>
-                <td>@item.CustomerName</td>
-                <td>@item.OrderDate</td>
-                <td>@item.ShippedDate</td>
-            </tr>
-        }
-    </table>
-</div>
+            @foreach (var @item in (List<Workshop.Models.Order>)@ViewBag.result)
+            {
+                <tr style="height:30px">
+                    <td>@item.OrderID</td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.OrderDate</td>
+                    <td>@item.ShippedDate</td>
+                    <td><a onclick="location.href = '/Default/Revise?OrderID='+@item.OrderID">修改</a></td>
+                    <td><a onclick="Delete(@item.OrderID, this)">刪除</a></td>
+                </tr>
+            }
+        </table>
+    </div>
 </body>
 </html>

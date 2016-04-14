@@ -1,0 +1,174 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<script src="~/scripts/jquery-1.9.1.min.js"></script>
+<script src="~/scripts/bootstrap.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Insert</title>
+    <script>
+        var Check = function(){
+            var temp = false;
+            $('#detail input, select').each(function(){
+                if(!$(this).val())
+                    temp = true;
+            });
+            if(!$('#CustomerID').val() || !$('#EmployeeID').val() || !$('#OrderDate').val() || !$('#RequiredDate').val() || !$('#ShipperID').val())
+                alert("必填項不能是空白");
+            else if(temp) {
+                alert("商品欄位不能是空白");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div>
+        <form action="/Default/Insert" method="post">
+            <div align="center">
+                <h2 style="text-align:center;"><strong>新增訂單</strong></h2>
+                <table class="table-bordered" style="width:50%; font-size:12pt;">
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;"><font color="yellow" size="3">*</font>客戶名稱</td>
+                        <td colspan="3">
+                            @Html.DropDownList("CustomerID", (List<SelectListItem>)@ViewBag.customerData, string.Empty)
+                        </td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;"><font color="yellow" size="3">*</font>負責員工名稱</td>
+                        <td colspan="3">
+                            @Html.DropDownList("EmployeeID", (List<SelectListItem>)@ViewBag.empData, string.Empty)
+                        </td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;"><font color="yellow" size="3">*</font>訂單日期</td>
+                        <td><input type="date" id="OrderDate" name="OrderDate"></td>
+                        <td style="background-color:#00994C; color:white; text-align:center;"><font color="yellow" size="3">*</font>需要日期</td>
+                        <td><input type="date" id="RequiredDate" name="RequiredDate"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;">出貨日期</td>
+                        <td colspan="3"><input type="date" id="ShippedDate" name="ShippedDate"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;"><font color="yellow" size="3">*</font>出貨公司名稱</td>
+                        <td colspan="3">
+                            @Html.DropDownList("ShipperID", (List<SelectListItem>)@ViewBag.shipperData, string.Empty)
+                        </td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;">運費</td>
+                        <td colspan="3"><input type="text" id="Freight" name="Freight"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;">出貨國家</td>
+                        <td><input type="text" id="ShipCountry" name="ShipCountry"></td>
+                        <td style="background-color:#00994C; color:white; text-align:center;">出貨城市</td>
+                        <td><input type="text" id="ShipCity" name="ShipCity"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;">出貨地區</td>
+                        <td><input type="text" id="ShipRegion" name="ShipRegion"></td>
+                        <td style="background-color:#00994C; color:white; text-align:center;">郵遞區號</td>
+                        <td><input type="text" id="ShipPostalCode" name="ShipPostalCode"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;">出貨地址</td>
+                        <td><input type="text" id="ShipAddress" name="ShipAddress"></td>
+                        <td style="background-color:#00994C; color:white; text-align:center;">出貨說明</td>
+                        <td><input type="text" id="ShipName" name="ShipName"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;">訂單金額總計</td>
+                        <td id="sum" colspan="3"></td>
+                    </tr>
+                    <tr style="height:50px">
+                        <td></td>
+                        <td colspan="3">
+                            <input type="submit" class="btn btn-warning" value="存檔" onclick="Check()" />
+                            <input type="button" class="btn btn-warning" value="回前一頁" onclick="location.href='/Default'">
+                        </td>
+                    </tr>
+                </table>
+                <div style="width:50%; text-align:right">*為必填</div>
+            </div>
+
+            <div align="center">
+                <h3 style="text-align:center;"><strong>訂單明細</strong></h3>
+                <div style="width:60%; text-align:left"><a onclick="Add()"> +新增商品</a></div>
+                <table id="detail" class="table" style="width:60%; font-size:12pt;">
+                    <thead>
+                        <tr style="height:30px">
+                            <td style="text-align:center;">商品</td>
+                            <td style="text-align:center;">單價</td>
+                            <td style="text-align:center;">數量</td>
+                            <td style="text-align:center;">小計</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@Html.DropDownList("ProductIdList", (List<SelectListItem>)@ViewBag.productData, string.Empty, new { onchange = "ShowPrice(this)" })</td>
+                            <td><input type="text" id="UnitPriceList" style="text-align:right" name="UnitPriceList" placeholder="0" oninput="SetPrice(this)"></td>
+                            <td><input type="text" id="QtyList" style="text-align:right" name="QtyList" placeholder="0" oninput="SetQty(this)"></td>
+                            <td></td>
+                            <td><input type="button" class="btn btn-default" value="取消" onclick="Delete(this)"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    var price = [];
+    var total = 0;
+    @{
+        for (int i = 0; i < ViewBag.price.Count; i++) {
+        <text>price[@i] = @ViewBag.price[@i];</text>
+        }
+    }
+    var ShowPrice = function(item){
+        $(item).closest('td').next('td').children().val(price[item.value-1]);
+        $(item).parent().next('td').next('td').children().val("");
+        total -= $(item).parent().next('td').next('td').next('td').html();
+        $('#sum').html(total);
+        $(item).parent().next('td').next('td').next('td').html(0);
+    }
+
+    var SetQty = function(item){
+        total -= $(item).parent().next('td').html();
+        $('#sum').html(total);
+        $(item).parent().next('td').html($(item).parent().prev('td').children().val() * $(item).val());
+        total += $(item).parent().prev('td').children().val() * $(item).val();
+        $('#sum').html(total);
+    }
+
+    var SetPrice = function(item){
+        total -= $(item).parent().next('td').next('td').html();
+        $('#sum').html(total);
+        $(item).parent().next('td').next('td').html($(item).parent().next('td').children().val() * $(item).val());
+        total += $(item).parent().next('td').children().val() * $(item).val();
+        $('#sum').html(total);
+    }
+
+    var Add = function(){
+        $('#detail tbody').append('<tr><td>' + $('#detail td:eq(4)')[0].innerHTML + '</td><td style="text-align:center;">' + $('#detail td:eq(5)')[0].innerHTML + '</td><td style="text-align:center;">' + $('#detail td:eq(6)')[0].innerHTML + '</td><td style="text-align:center;"></td><td>' + $('#detail td:eq(8)')[0].innerHTML + '</td></tr>');
+    }
+
+    var Delete = function (item) {
+        if($(item).closest('tbody').find('tr').length == 1)
+            alert("至少一樣商品");
+        else {
+            total -= $(item).parent().prev('td').html();
+            $('#sum').html(total);
+            $(item).parent().parent().remove();
+
+        }
+    }
+</script>
+</html>

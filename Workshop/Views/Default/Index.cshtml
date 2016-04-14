@@ -1,58 +1,62 @@
-﻿
-@{
+﻿@{
     Layout = null;
 }
 
 <!DOCTYPE html>
 <html>
+<script src="~/scripts/jquery-1.9.1.min.js"></script>
+<script src="~/scripts/bootstrap.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
-    
+
 </head>
 <body>
-    <h2>訂單查詢</h2>
-    <form action="/Default/Result" method="post">
-        <table border="1" style="width:100%" border-collapse="collapse">
-            <tr>
-                <td>訂單編號</td>
-                <td colspan="3"><input type="text" id="OrderID" name="OrderID"></td>
-            </tr>
-            <tr>
-                <td>客戶名稱</td>
-                <td colspan="3"><input type="text" id="CustomerName" name="CustomerName"></td>
-            </tr>
-            <tr>
-                <td>負責員工</td>
-                <td colspan="3">
-                    @Html.DropDownList("EmployeeID", (List<SelectListItem>)@ViewBag.empData, string.Empty)
-                </td>
-            </tr>
-            <tr>
-                <td>出貨公司</td>
-                <td colspan="3">
-                    @Html.DropDownList("ShipperID", (List<SelectListItem>)@ViewBag.shipperData, string.Empty)
-                </td>
-            </tr>
-            <tr>
-                <td>訂購日期</td>
-                <td><input type="date" id="OrderDate" name="OrderDate"></td>
-                <td>出貨日期</td>
-                <td><input type="date" id="ShippedDate" name="ShippedDate"></td>
-            </tr>
-            <tr>
-                <td>需要日期</td>
-                <td colspan="3"><input type="date" id="RequiredDate" name="RequiredDate"></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td colspan="3">
-                    <input type="submit" value="查詢"/>
-                    <button value="search">清除</button>
-                    <button value="search">新增訂單</button>
-                </td>
-            </tr>
-        </table>
-    </form>
+    <div>
+        <h2 style="text-align:center;"><strong>訂單查詢</strong></h2>
+        <form action="/Default/Result" method="post">
+            <table class="table-bordered" style="width:50%; font-size:12pt;" align="center">
+                <tr style="height:30px">
+                    <td style="background-color:#00994C; color:white; text-align:center;">訂單編號</td>
+                    <td colspan="3"><input type="text" style="height:30px;" id="OrderID" name="OrderID"></td>
+                </tr>
+                <tr style="height:30px">
+                    <td style="background-color:#00994C; color:white; text-align:center;">客戶名稱</td>
+                    <td colspan="3"><input type="text" id="CustomerName" name="CustomerName"></td>
+                </tr>
+                <tr style="height:30px">
+                    <td style="background-color:#00994C; color:white; text-align:center;">負責員工</td>
+                    <td colspan="3">
+                        @Html.DropDownList("EmployeeID", (List<SelectListItem>)@ViewBag.empData, string.Empty)
+                    </td>
+                </tr>
+                <tr style="height:30px">
+                    <td style="background-color:#00994C;color:white; text-align:center;">出貨公司</td>
+                    <td colspan="3">
+                        @Html.DropDownList("ShipperID", (List<SelectListItem>)@ViewBag.shipperData, string.Empty)
+                    </td>
+                </tr>
+                <tr style="height:30px">
+                    <td style="background-color:#00994C; color:white; text-align:center;">訂購日期</td>
+                    <td><input type="date" id="OrderDate" name="OrderDate"></td>
+                    <td style="background-color:#00994C; color:white; text-align:center;">出貨日期</td>
+                    <td><input type="date" id="ShippedDate" name="ShippedDate"></td>
+                </tr>
+                <tr style="height:30px">
+                    <td style="background-color:#00994C; color:white; text-align:center;">需要日期</td>
+                    <td colspan="3"><input type="date" id="RequiredDate" name="RequiredDate"></td>
+                </tr>
+                <tr style="height:50px">
+                    <td></td>
+                    <td colspan="3">
+                        <input type="submit" class="btn btn-warning" value="查詢" />
+                        <input type="reset" class="btn btn-warning" value="清除" />
+                        <input type="button" class="btn btn-warning" value="新增訂單" onclick="location.href='/Default/Insert'">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
 </body>
 </html>

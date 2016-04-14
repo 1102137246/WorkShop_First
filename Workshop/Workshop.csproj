@@ -161,6 +161,8 @@
     <Content Include="Views\Default\Index.cshtml" />
     <Content Include="scripts\jquery-1.9.1.min.map" />
     <Content Include="Views\Default\Result.cshtml" />
+    <Content Include="Views\Default\Insert.cshtml" />
+    <Content Include="Views\Default\Revise.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,0 +1,194 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<script src="~/scripts/jquery-1.9.1.min.js"></script>
+<script src="~/scripts/bootstrap.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Revise</title>
+    <script>
+        var Check = function(){
+            var temp = false;
+            $('#detail input, select').each(function(){
+                if(!$(this).val())
+                    temp = true;
+            });
+            if(!$('#CustomerID').val() || !$('#EmployeeID').val() || !$('#OrderDate').val() || !$('#RequiredDate').val() || !$('#ShipperID').val())
+                alert("必填項不能是空白");
+            else if(temp) {
+                alert("商品欄位不能是空白");
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div>
+        <form action="/Default/Revise" method="post">
+            <div align="center">
+                <h2 style="text-align:center;"><strong>修改訂單</strong></h2>
+                <table class="table-bordered" style="width:50%; font-size:12pt;">
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white; text-align:center;">訂單編號</td>
+                        <td colspan="3">@ViewBag.order.OrderID</td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;"><font color="yellow" size="3">*</font>客戶名稱</td>
+                        <td colspan="3">
+                            @Html.DropDownList("CustomerID", (List<SelectListItem>)@ViewBag.customerData)
+                        </td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;"><font color="yellow" size="3">*</font>負責員工名稱</td>
+                        <td colspan="3">
+                            @Html.DropDownList("EmployeeID", (List<SelectListItem>)@ViewBag.empData)
+                        </td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;"><font color="yellow" size="3">*</font>訂單日期</td>
+                        <td><input type="date" id="OrderDate" name="OrderDate" value="@ViewBag.OrderDate"></td>
+                        <td style="background-color:#00994C; color:white;"><font color="yellow" size="3">*</font>需要日期</td>
+                        <td><input type="date" id="RequiredDate" name="RequiredDate" value="@ViewBag.RequiredDate"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;">出貨日期</td>
+                        <td colspan="3"><input type="date" id="ShippedDate" name="ShippedDate" value="@ViewBag.ShippedDate"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;"><font color="yellow" size="3">*</font>出貨公司名稱</td>
+                        <td colspan="3">
+                            @Html.DropDownList("ShipperID", (List<SelectListItem>)@ViewBag.shipperData)
+                        </td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;">運費</td>
+                        <td colspan="3"><input type="text" id="Freight" name="Freight" value="@ViewBag.order.Freight"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;">出貨國家</td>
+                        <td><input type="text" id="ShipCountry" name="ShipCountry" value="@ViewBag.order.ShipCountry"></td>
+                        <td style="background-color:#00994C; color:white;">出貨城市</td>
+                        <td><input type="text" id="ShipCity" name="ShipCity" value="@ViewBag.order.ShipCity"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;">出貨地區</td>
+                        <td><input type="text" id="ShipRegion" name="ShipRegion" value="@ViewBag.order.ShipRegion"></td>
+                        <td style="background-color:#00994C; color:white;">郵遞區號</td>
+                        <td><input type="text" id="ShipPostalCode" name="ShipPostalCode" value="@ViewBag.order.ShipPostalCode"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;">出貨地址</td>
+                        <td><input type="text" id="ShipAddress" name="ShipAddress" value="@ViewBag.order.ShipAddress"></td>
+                        <td style="background-color:#00994C; color:white;">出貨說明</td>
+                        <td><input type="text" id="ShipName" name="ShipName" value="@ViewBag.order.ShipName"></td>
+                    </tr>
+                    <tr style="height:30px">
+                        <td style="background-color:#00994C; color:white;">訂單金額總計</td>
+                        <td colspan="3" id="total"></td>
+                    </tr>
+                    <tr style="height:50px">
+                        <td></td>
+                        <td colspan="3">
+                            <input type="submit" class="btn btn-warning" value="存檔" onclick="Check()"/>
+                            <input type="reset" class="btn btn-warning" value="刪除本筆訂單"/>
+                            <input type="button" class="btn btn-warning" value="回前一頁" onclick="location.href='/Default'">
+                        </td>
+                    </tr>
+                </table>
+                <div style="width:50%; text-align:right">*為必填</div>
+
+                <h3><strong>訂單明細</strong></h3>
+                <div style="width:60%; text-align:left"><a onclick="Add()"> +新增商品</a></div>
+                <table id="detail" class="table" style="width:60%; font-size:12pt;">
+                    <thead>
+                        <tr style="height:30px">
+                            <td>商品</td>
+                            <td>單價</td>
+                            <td>數量</td>
+                            <td>小計</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            for (int i = 0; i < ViewBag.productData.Count; i++)
+                            {
+                                <tr>
+                                    <td>@Html.DropDownList("ProductIdList", (List<SelectListItem>)@ViewBag.productData[i], new { onchange = "ShowPrice(this)" })</td>
+                                    <td><input type="text" id="UnitPriceList" style="text-align:right" name="UnitPriceList" value="@ViewBag.order.UnitPriceList[i]" oninput="SetPrice(this)" /></td>
+                                    <td><input type="text" id="QtyList" style="text-align:right" name="QtyList" value="@ViewBag.order.QtyList[i]" oninput="SetQty(this)" /></td>
+                                    <td id="subtotal">@Html.Raw(Convert.ToDouble(ViewBag.order.UnitPriceList[i]) * Convert.ToDouble(ViewBag.order.QtyList[i]))</td>
+                                    <td><input type="button" class="btn btn-default" value="取消" onclick="Delete(this)"></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+
+</body>
+<script>
+    var price = [];
+    var total = 0;
+    var ProductIdList = $('#ProductIdList').clone();
+    ProductIdList.find('option:selected').removeAttr("selected");
+
+    var Delete = function (item) {
+        if ($(item).closest('tbody').find('tr').length == 1)
+            alert("至少一樣商品");
+        else {
+            total -= $(item).parent().prev('td').html();
+            $('#total').html(parseFloat(total.toFixed(2)));
+            $(item).parent().parent().remove();
+        }
+    }
+
+    @{
+        for (int i = 0; i < ViewBag.price.Count; i++) {
+        <text>price[@i] = @ViewBag.price[@i];</text>
+        }
+    }
+
+    var ShowPrice = function(item){
+        $(item).closest('td').next('td').children().val(price[item.value-1]);
+        $(item).parent().next('td').next('td').children().val("");
+        total -= $(item).parent().next('td').next('td').next('td').html();
+        $('#total').html(parseFloat(total.toFixed(2)));
+        $(item).parent().next('td').next('td').next('td').html(0);
+    }
+
+    var SetQty = function (item) {
+        total -= $(item).parent().next('td').html();
+        $('#total').html(parseFloat(total.toFixed(2)));
+        $(item).parent().next('td').html(parseFloat(($(item).parent().prev('td').children().val() * $(item).val()).toFixed(2)));
+        total += $(item).parent().prev('td').children().val() * $(item).val();
+        $('#total').html(parseFloat(total.toFixed(2)));
+    }
+
+    var SetPrice = function (item) {
+        total -= $(item).parent().next('td').next('td').html();
+        $('#total').html(parseFloat(total.toFixed(2)));
+        $(item).parent().next('td').next('td').html(parseFloat(($(item).parent().next('td').children().val() * $(item).val()).toFixed(2)));
+        total += $(item).parent().next('td').children().val() * $(item).val();
+        $('#total').html(parseFloat(total.toFixed(2)));
+    }
+
+    var Add = function (item) {
+        $('#detail').append('<tr><td><select id="ProductIdList" name="ProductIdList" onchange = "ShowPrice(this)"><option value="" selected="true">請選擇</option>' + ProductIdList.html() + '</select></td><td><input type="text" style="text-align:right" id="UnitPriceList" name="UnitPriceList" oninput="SetPrice(this)" /></td><td><input type"text"  style="text-align:right" id="QtyList" name="QtyList" oninput="SetQty(this)""></td><td style="text-align:right"></td><td><input type="button" class="btn btn-default" value="取消" onclick="Delete(this)"></td></tr>');
+    }
+
+    $(document).ready(function () {
+        $('#detail td#subtotal').each(function () {
+            total += parseFloat($(this).html());
+        });
+        $('#total').html(total);
+    })
+
+</script>
+</html>

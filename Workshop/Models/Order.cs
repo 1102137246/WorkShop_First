@@ -34,6 +34,26 @@ namespace Workshop.Models
         public string EmployeeName { get; set; }
 
         /// <summary>
+        /// 商品代號
+        /// </summary>
+        public int ProductID { get; set; }
+
+        /// <summary>
+        /// 商品名稱
+        /// </summary>
+        public string ProductName { get; set; }
+
+        /// <summary>
+        /// 商品單價
+        /// </summary>
+        public string UnitPrice { get; set; }
+
+        /// <summary>
+        /// 商品數量
+        /// </summary>
+        public int Qty { get; set; }
+
+        /// <summary>
         /// 訂單日期
         /// </summary>
         public DateTime ? OrderDate {get;set;}
@@ -61,7 +81,7 @@ namespace Workshop.Models
         /// <summary>
         /// 運費
         /// </summary>
-        public double Freight {get;set;}
+        public string Freight {get;set;}
 
         /// <summary>
         /// 出貨說明
@@ -74,7 +94,7 @@ namespace Workshop.Models
         public string ShipAddress {get;set;}
 
         /// <summary>
-        /// 出貨程式
+        /// 出貨城市
         /// </summary>
         public string ShipCity {get;set;}
 
@@ -92,5 +112,11 @@ namespace Workshop.Models
         /// 出貨國家
         /// </summary>
         public string ShipCountry { get; set; }
+
+        public List<int> ProductIdList { get; set; }
+
+        public List<string> UnitPriceList { get; set; }
+
+        public List<string> QtyList { get; set; }
     }
 }
