@@ -59,7 +59,7 @@ namespace Workshop.Controllers
                 customerData.Add(new SelectListItem()
                 {
                     Text = item.CustomerName,
-                    Value = item.CustomerID.ToString()
+                    Value = item.CustomerID.ToString(),
                 });
             }
             ViewBag.customerData = customerData;
@@ -71,7 +71,7 @@ namespace Workshop.Controllers
                 empData.Add(new SelectListItem()
                 {
                     Text = item.EmployeeName,
-                    Value = item.EmployeeID.ToString()
+                    Value = item.EmployeeID.ToString(),
                 });
             }
             ViewBag.empData = empData;
@@ -83,7 +83,7 @@ namespace Workshop.Controllers
                 shipperData.Add(new SelectListItem()
                 {
                     Text = item.ShipperName,
-                    Value = item.ShipperId.ToString()
+                    Value = item.ShipperId.ToString(),
                 });
             }
             ViewBag.shipperData = shipperData;
@@ -111,11 +111,11 @@ namespace Workshop.Controllers
         }
 
         [HttpPost]
-        public JsonResult Insert(Models.Order order)
+        public ActionResult Insert(Models.Order order)
         {
             Models.Service service = new Models.Service();
             service.InsertOrder(order);
-            return null;
+            return Redirect("Index");
         }
 
         [HttpGet]
@@ -203,20 +203,17 @@ namespace Workshop.Controllers
         public JsonResult Revise(Models.Order order)
         {
             Models.Service service = new Models.Service();
+            service.Update(order);
             return null;
 
         }
 
-        public void ReviseOrder(Models.Order order)
-        {
-        
-        }
 
         [HttpGet]
-        public JsonResult Delete(int orderId)
+        public JsonResult Delete(int OrderID)
         {
             Models.Service service = new Models.Service();
-            service.DeleteOrderById(orderId);
+            service.DeleteOrderById(OrderID);
             return null;
         }
 

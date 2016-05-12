@@ -6,10 +6,12 @@
 <!DOCTYPE html>
 
 <html>
-<script src="~/scripts/jquery-1.9.1.min.js"></script>
-<script src="~/scripts/bootstrap.min.js"></script>
-<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 <head>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/kendo.common.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/kendo.metro.min.css" rel="stylesheet" />
+    <script src="~/scripts/kendo/jquery.min.js"></script>
+    <script src="~/scripts/kendo/kendo.all.min.js"></script>
     <meta name="viewport" content="width=device-width" />
     <title>Insert</title>
     <script>
@@ -19,17 +21,22 @@
                 if(!$(this).val())
                     temp = true;
             });
-            if(!$('#CustomerID').val() || !$('#EmployeeID').val() || !$('#OrderDate').val() || !$('#RequiredDate').val() || !$('#ShipperID').val())
+            if(!$('#CustomerID').val() || !$('#EmployeeID').val() || !$('#OrderDate').val() || !$('#RequiredDate').val() || !$('#ShipperID').val()){
                 alert("必填項不能是空白");
+                return false;
+            }    
             else if(temp) {
                 alert("商品欄位不能是空白");
+                return false;
             }
+            else
+                return true;
         }
     </script>
 </head>
 <body>
     <div>
-        <form action="/Default/Insert" method="post">
+        <form action="/Default/Insert" method="post" onsubmit="return Check()">
             <div align="center">
                 <h2 style="text-align:center;"><strong>新增訂單</strong></h2>
                 <table class="table-bordered" style="width:50%; font-size:12pt;">
@@ -63,25 +70,25 @@
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white; text-align:center;">運費</td>
-                        <td colspan="3"><input type="text" id="Freight" name="Freight"></td>
+                        <td colspan="3"><input type="text" id="Freight" class="k-textbox" name="Freight"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white; text-align:center;">出貨國家</td>
-                        <td><input type="text" id="ShipCountry" name="ShipCountry"></td>
+                        <td><input type="text" class="k-textbox" id="ShipCountry" name="ShipCountry"></td>
                         <td style="background-color:#00994C; color:white; text-align:center;">出貨城市</td>
-                        <td><input type="text" id="ShipCity" name="ShipCity"></td>
+                        <td><input type="text" class="k-textbox" id="ShipCity" name="ShipCity"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white; text-align:center;">出貨地區</td>
-                        <td><input type="text" id="ShipRegion" name="ShipRegion"></td>
+                        <td><input type="text" class="k-textbox" id="ShipRegion" name="ShipRegion"></td>
                         <td style="background-color:#00994C; color:white; text-align:center;">郵遞區號</td>
-                        <td><input type="text" id="ShipPostalCode" name="ShipPostalCode"></td>
+                        <td><input type="text" class="k-textbox" id="ShipPostalCode" name="ShipPostalCode"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white; text-align:center;">出貨地址</td>
-                        <td><input type="text" id="ShipAddress" name="ShipAddress"></td>
+                        <td><input type="text" class="k-textbox" id="ShipAddress" name="ShipAddress"></td>
                         <td style="background-color:#00994C; color:white; text-align:center;">出貨說明</td>
-                        <td><input type="text" id="ShipName" name="ShipName"></td>
+                        <td><input type="text" class="k-textbox" id="ShipName" name="ShipName"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white; text-align:center;">訂單金額總計</td>
@@ -90,8 +97,8 @@
                     <tr style="height:50px">
                         <td></td>
                         <td colspan="3">
-                            <input type="submit" class="btn btn-warning" value="存檔" onclick="Check()" />
-                            <input type="button" class="btn btn-warning" value="回前一頁" onclick="location.href='/Default'">
+                            <input type="submit" id="submit" value="存檔" />
+                            <input type="button" id="back" value="回前一頁" onclick="location.href='/Default'">
                         </td>
                     </tr>
                 </table>
@@ -125,6 +132,34 @@
     </div>
 </body>
 <script>
+    $('#OrderDate').kendoDatePicker();
+    $('#RequiredDate').kendoDatePicker();
+    $('#ShippedDate').kendoDatePicker();
+    $('#submit').kendoButton();
+    $('#back').kendoButton();
+    $('#CustomerID').kendoComboBox({
+        filter: "contains",
+        suggest: true,
+    });
+    $('#EmployeeID').kendoComboBox({
+        filter: "contains",
+        suggest: true,
+    });
+    $('#ShipperID').kendoComboBox({
+        filter: "contains",
+        suggest: true,
+    });
+    $('#Freight').kendoNumericTextBox({
+        format: "c",
+        min: 1,
+        decimals: 3
+    });
+    $('#ProductIdList').kendoComboBox({
+        filter: "contains",
+        suggest: true,
+    });
+
+
     var price = [];
     var total = 0;
     @{
@@ -155,9 +190,16 @@
         total += $(item).parent().next('td').children().val() * $(item).val();
         $('#sum').html(total);
     }
-
+    var detailCount = 2;
     var Add = function(){
-        $('#detail tbody').append('<tr><td>' + $('#detail td:eq(4)')[0].innerHTML + '</td><td style="text-align:center;">' + $('#detail td:eq(5)')[0].innerHTML + '</td><td style="text-align:center;">' + $('#detail td:eq(6)')[0].innerHTML + '</td><td style="text-align:center;"></td><td>' + $('#detail td:eq(8)')[0].innerHTML + '</td></tr>');
+        $('#detail tbody').append('<tr><td>' + $('#detail td:eq(4)')[0].innerHTML + '</td><td><input type="text" id="UnitPriceList'+detailCount+'" style="text-align:right" name="UnitPriceList" placeholder="0" oninput="SetPrice(this)"></td><td><input type="text" id="QtyList'+detailCount+'" style="text-align:right" name="QtyList" placeholder="0" oninput="SetQty(this)"></td><td></td><td><input type="button" class="btn btn-default" value="取消" onclick="Delete(this)"></td></tr>');
+        $('#detail tr').last().find("select").attr("id", "ProductIdList"+detailCount);
+        $('#detail tr').last().find("select").attr("selected", "-1");
+        $('#ProductIdList'+detailCount).kendoComboBox({
+            filter: "contains",
+            suggest: true,
+        });
+        detailCount++;
     }
 
     var Delete = function (item) {
@@ -170,5 +212,6 @@
 
         }
     }
+    
 </script>
 </html>

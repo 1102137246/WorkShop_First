@@ -5,10 +5,12 @@
 <!DOCTYPE html>
 
 <html>
-<script src="~/scripts/jquery-1.9.1.min.js"></script>
-<script src="~/scripts/bootstrap.min.js"></script>
-<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 <head>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/kendo.common.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/kendo.metro.min.css" rel="stylesheet" />
+    <script src="~/scripts/kendo/jquery.min.js"></script>
+    <script src="~/scripts/kendo/kendo.all.min.js"></script>
     <meta name="viewport" content="width=device-width" />
     <title>Revise</title>
     <script>
@@ -18,11 +20,34 @@
                 if(!$(this).val())
                     temp = true;
             });
-            if(!$('#CustomerID').val() || !$('#EmployeeID').val() || !$('#OrderDate').val() || !$('#RequiredDate').val() || !$('#ShipperID').val())
+            if(!$('#CustomerID').val() || !$('#EmployeeID').val() || !$('#OrderDate').val() || !$('#RequiredDate').val() || !$('#ShipperID').val()){
                 alert("必填項不能是空白");
+                return false;
+            }
             else if(temp) {
                 alert("商品欄位不能是空白");
+                return false;
             }
+            else
+                return true;
+        }
+
+        var reviseDelete = function (orderId) {
+            $.ajax({
+                url: '/Default/Delete',
+                type: 'GET',
+                data: {
+                    OrderID: orderId
+                },
+                error: function (xhr) {
+                    alert('Ajax request 發生錯誤');
+                },
+                success: function () {
+
+                }
+            });
+            alert("刪除成功");
+            document.location.href="/Default/Index";
         }
 
     </script>
@@ -35,7 +60,7 @@
                 <table class="table-bordered" style="width:50%; font-size:12pt;">
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white; text-align:center;">訂單編號</td>
-                        <td colspan="3">@ViewBag.order.OrderID</td>
+                        <td colspan="3"><input type="text" class="k-textbox" id="OrderID" name="OrderID" value="@ViewBag.order.OrderID" readonly /></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white;"><font color="yellow" size="3">*</font>客戶名稱</td>
@@ -67,25 +92,25 @@
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white;">運費</td>
-                        <td colspan="3"><input type="text" id="Freight" name="Freight" value="@ViewBag.order.Freight"></td>
+                        <td colspan="3"><input type="text" id="Freight" class="k-textbox" id="Freight" name="Freight" value="@ViewBag.order.Freight"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white;">出貨國家</td>
-                        <td><input type="text" id="ShipCountry" name="ShipCountry" value="@ViewBag.order.ShipCountry"></td>
+                        <td><input type="text" class="k-textbox" id="ShipCountry" name="ShipCountry" value="@ViewBag.order.ShipCountry"></td>
                         <td style="background-color:#00994C; color:white;">出貨城市</td>
-                        <td><input type="text" id="ShipCity" name="ShipCity" value="@ViewBag.order.ShipCity"></td>
+                        <td><input type="text" class="k-textbox" id="ShipCity" name="ShipCity" value="@ViewBag.order.ShipCity"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white;">出貨地區</td>
-                        <td><input type="text" id="ShipRegion" name="ShipRegion" value="@ViewBag.order.ShipRegion"></td>
+                        <td><input type="text" class="k-textbox" id="ShipRegion" name="ShipRegion" value="@ViewBag.order.ShipRegion"></td>
                         <td style="background-color:#00994C; color:white;">郵遞區號</td>
-                        <td><input type="text" id="ShipPostalCode" name="ShipPostalCode" value="@ViewBag.order.ShipPostalCode"></td>
+                        <td><input type="text" class="k-textbox" id="ShipPostalCode" name="ShipPostalCode" value="@ViewBag.order.ShipPostalCode"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white;">出貨地址</td>
-                        <td><input type="text" id="ShipAddress" name="ShipAddress" value="@ViewBag.order.ShipAddress"></td>
+                        <td><input type="text" class="k-textbox" id="ShipAddress" name="ShipAddress" value="@ViewBag.order.ShipAddress"></td>
                         <td style="background-color:#00994C; color:white;">出貨說明</td>
-                        <td><input type="text" id="ShipName" name="ShipName" value="@ViewBag.order.ShipName"></td>
+                        <td><input type="text" class="k-textbox" id="ShipName" name="ShipName" value="@ViewBag.order.ShipName"></td>
                     </tr>
                     <tr style="height:30px">
                         <td style="background-color:#00994C; color:white;">訂單金額總計</td>
@@ -94,9 +119,9 @@
                     <tr style="height:50px">
                         <td></td>
                         <td colspan="3">
-                            <input type="submit" class="btn btn-warning" value="存檔" onclick="Check()"/>
-                            <input type="reset" class="btn btn-warning" value="刪除本筆訂單"/>
-                            <input type="button" class="btn btn-warning" value="回前一頁" onclick="location.href='/Default'">
+                            <input type="submit" id="submit" value="存檔" onclick="Check()" />
+                            <input type="button" id="delete" value="刪除本筆訂單" onclick="reviseDelete('@ViewBag.order.OrderID')"/>
+                            <input type="button" id="back" value="回前一頁" onclick="location.href='/Default'">
                         </td>
                     </tr>
                 </table>
@@ -133,7 +158,33 @@
     </div>
 
 </body>
+
+</html>
 <script>
+    $('#OrderDate').kendoDatePicker();
+    $('#RequiredDate').kendoDatePicker();
+    $('#ShippedDate').kendoDatePicker();
+    $('#submit').kendoButton();
+    $('#delete').kendoButton();
+    $('#back').kendoButton();
+    $('#CustomerID').kendoComboBox({
+        filter: "contains",
+        suggest: true,
+    });
+    $('#EmployeeID').kendoComboBox({
+        filter: "contains",
+        suggest: true,
+    });
+    $('#ShipperID').kendoComboBox({
+        filter: "contains",
+        suggest: true,
+    });
+    $('#Freight').kendoNumericTextBox({
+        format: "c",
+        min: 1,
+        decimals: 3
+    });
+
     var price = [];
     var total = 0;
     var ProductIdList = $('#ProductIdList').clone();
@@ -191,4 +242,3 @@
     })
 
 </script>
-</html>

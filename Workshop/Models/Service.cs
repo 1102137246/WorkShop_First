@@ -194,6 +194,128 @@ namespace Workshop.Models
             return this.ConvertReviseToList(dt, dtDetail);
         }
 
+        public void Update(Models.Order order) {
+            DataTable dt = new DataTable();
+            string sql = @"SELECT
+                                ProductID
+                            FROM
+                                Sales.OrderDetails
+                            WHERE
+                                OrderID = @OrderID";
+            string updateOrderSql = @"UPDATE Sales.Orders
+                                    SET CustomerID = @CustomerID,
+                                        EmployeeID = @EmployeeID,
+	                                    OrderDate = @OrderDate,
+	                                    RequiredDate = @RequiredDate,
+	                                    ShippedDate = @ShippedDate,
+	                                    ShipperID = @ShipperID,
+	                                    Freight = @Freight,
+	                                    ShipCountry = @ShipCountry,
+	                                    ShipCity = @ShipCity,
+	                                    ShipRegion = @ShipRegion,
+	                                    ShipPostalCode = @ShipPostalCode,
+	                                    ShipAddress = @ShipAddress,
+	                                    ShipName = @ShipName
+                                    WHERE OrderID = @OrderID";
+            string updateOrderDetailSql = @"UPDATE Sales.OrderDetails
+                                            SET ProductID = @ProductID,
+                                                UnitPrice = @UnitPrice,
+	                                            Qty = @Qty
+                                            WHERE OrderID = @OrderID AND ProductID = @ProductID";
+            string InsertOrderDetailSql = @"INSERT INTO Sales.OrderDetails (
+			                                    OrderID,
+			                                    ProductID,
+		                                        UnitPrice,
+                                                Qty,
+		                                        Discount
+                                            )
+                                            VALUES (
+                                                @OrderID,
+                                                @ProductID,
+                                                @UnitPrice,
+                                                @Qty,
+                                                @Discount
+                                            )";
+            string DeleteOrderDetailSql = @"DELETE FROM Sales.OrderDetails WHERE OrderID = @OrderID AND ProductID = @ProductID";
+            using (SqlConnection conn = new SqlConnection(this.GetConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(updateOrderSql, conn);
+                cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderID));
+                cmd.Parameters.Add(new SqlParameter("@CustomerID", order.CustomerID));
+                cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.EmployeeID));
+                cmd.Parameters.Add(new SqlParameter("@OrderDate", order.OrderDate));
+                cmd.Parameters.Add(new SqlParameter("@RequiredDate", order.RequiredDate));
+                cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@ShipperID", order.ShipperId));
+                cmd.Parameters.Add(new SqlParameter("@Freight", order.Freight ?? string.Empty));
+                cmd.Parameters.Add(new SqlParameter("@ShipCountry", order.ShipCountry ?? string.Empty));
+                cmd.Parameters.Add(new SqlParameter("@ShipCity", order.ShipCity ?? string.Empty));
+                cmd.Parameters.Add(new SqlParameter("@ShipRegion", order.ShipRegion ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@ShipPostalCode", order.ShipPostalCode ?? (object)DBNull.Value));
+                cmd.Parameters.Add(new SqlParameter("@ShipAddress", order.ShipAddress ?? string.Empty));
+                cmd.Parameters.Add(new SqlParameter("@ShipName", order.ShipName ?? string.Empty));
+                cmd.ExecuteNonQuery();
+                cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderID));
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+            List<int> orderDetail = new List<int>();
+            foreach (DataRow row in dt.Rows)
+            {
+                orderDetail.Add((int)row["ProductID"]);
+            }
+            for (int i = 0; i < orderDetail.Count; i++)
+            {
+                if (!order.ProductIdList.Contains(orderDetail[i]))
+                {
+                    using (SqlConnection conn = new SqlConnection(this.GetConnectionString()))
+                    {
+                        conn.Open();
+                        SqlCommand cmd = new SqlCommand(DeleteOrderDetailSql, conn);
+                        cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderID));
+                        cmd.Parameters.Add(new SqlParameter("@ProductID", orderDetail[i]));
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            for (int i = 0; i < order.ProductIdList.Count; i++)
+            {
+                if (orderDetail.Contains(order.ProductIdList[i]))
+                {
+                    using (SqlConnection conn = new SqlConnection(this.GetConnectionString()))
+                    {
+                        conn.Open();
+                        SqlCommand cmd = new SqlCommand(updateOrderDetailSql, conn);
+                        cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderID));
+                        cmd.Parameters.Add(new SqlParameter("@ProductID", order.ProductIdList[i]));
+                        cmd.Parameters.Add(new SqlParameter("@UnitPrice", order.UnitPriceList[i]));
+                        cmd.Parameters.Add(new SqlParameter("@Qty", order.QtyList[i]));
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+                else if (!orderDetail.Contains(order.ProductIdList[i]))
+                {
+                    using (SqlConnection conn = new SqlConnection(this.GetConnectionString()))
+                    {
+                        conn.Open();
+                        SqlCommand cmd = new SqlCommand(InsertOrderDetailSql, conn);
+                        cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderID));
+                        cmd.Parameters.Add(new SqlParameter("@ProductID", order.ProductIdList[i]));
+                        cmd.Parameters.Add(new SqlParameter("@UnitPrice", order.UnitPriceList[i]));
+                        cmd.Parameters.Add(new SqlParameter("@Qty", order.QtyList[i]));
+                        cmd.Parameters.Add(new SqlParameter("@Discount", "0"));
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
         private Models.Order ConvertReviseToList(DataTable dt, DataTable dtDetail)
         {
             Models.Order order = new Order();
